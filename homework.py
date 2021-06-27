@@ -51,4 +51,29 @@ class CaloriesCalculator(Calculator):
         else:
             msg = 'Хватит есть!'
         return msg
-# class CashCalculator(Calculator):
+
+
+class CashCalculator(Calculator):
+    USD_RATE = 72
+    EURO_RATE = 86
+    RUB_RATE = 1
+
+    def __init__(self, limit) -> None:
+        super().__init__(limit)
+
+    def get_today_cash_remained(self, currency):
+        currencies = {'usd': (self.USD_RATE, 'USD'),
+                      'eur': (self.EURO_RATE, 'Euro'),
+                      'rub': (self.RUB_RATE, 'руб')}
+        self.cash = self.get_today_stats()
+        if self.cash == self.limit:
+            return 'Денег нет, держись'
+        try:
+            remained_cash = (self.limit - self.cash) / currencies[currency][0]
+            debt_cash = (self.cash - self.limit) / currencies[currency][0]
+        except KeyError:
+            return 'Указанной валюты в базе нет'
+        if self.cash < Calculator.limit:
+            return f'На сегодня осталось {remained_cash} {currencies[currency][1]}'
+        else:
+            return f'Денег нет, держись: твой долг - {debt_cash} {currencies[currency][1]}'
