@@ -46,20 +46,16 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         eaten_today = self.limit - self.get_today_stats()
         if eaten_today > 0:
-            msg = (f'Сегодня можно съесть что-нибудь ещё, но с общей '
-                   f'калорийностью не более {eaten_today} кКал')
+            return (f'Сегодня можно съесть что-нибудь ещё, но с общей '
+                    f'калорийностью не более {eaten_today} кКал')
         else:
-            msg = 'Хватит есть!'
-        return msg
+            return 'Хватит есть!'
 
 
 class CashCalculator(Calculator):
-    USD_RATE = 72
-    EURO_RATE = 86
-    RUB_RATE = 1
-
-    def __init__(self, limit) -> None:
-        super().__init__(limit)
+    USD_RATE = 72.0
+    EURO_RATE = 86.0
+    RUB_RATE = 1.0
 
     def get_today_cash_remained(self, currency):
         currencies = {'usd': (self.USD_RATE, 'USD'),
@@ -69,11 +65,15 @@ class CashCalculator(Calculator):
         if self.cash == self.limit:
             return 'Денег нет, держись'
         try:
-            remained_cash = (self.limit - self.cash) / currencies[currency][0]
-            debt_cash = (self.cash - self.limit) / currencies[currency][0]
+            remained_cash = round((
+                self.limit - self.cash) / currencies[currency][0], 2)
+            debt_cash = round((
+                self.cash - self.limit) / currencies[currency][0], 2)
         except KeyError:
             return 'Указанной валюты в базе нет'
-        if self.cash < Calculator.limit:
-            return f'На сегодня осталось {remained_cash} {currencies[currency][1]}'
+        if self.cash < self.limit:
+            return (f'На сегодня осталось {remained_cash}'
+                    f' {currencies[currency][1]}')
         else:
-            return f'Денег нет, держись: твой долг - {debt_cash} {currencies[currency][1]}'
+            return (f'Денег нет, держись: твой долг - '
+                    f'{debt_cash} {currencies[currency][1]}')
